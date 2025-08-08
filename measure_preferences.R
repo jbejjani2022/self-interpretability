@@ -65,7 +65,7 @@ analyze_model <- function(
       attr3_diff_normalized + attr4_diff_normalized + attr5_diff_normalized,
     data = filter(regression_data, scenario == first(scenario)),
     family = "bernoulli",
-    prior(normal(0, 1), class = b), t To prevent these terms from exploding
+    prior(normal(0, 1), class = b), # Prevent these terms from exploding.
   )
 
   safe_brm_fit <- function(data_subset) {
