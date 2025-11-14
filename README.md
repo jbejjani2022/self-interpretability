@@ -9,7 +9,7 @@ and [Jorge Morales](https://subjectivity.sites.northeastern.edu/)
 
 This repository contains the script used to run the experiments described in
 _Self-Interpretability: LLMs Can Describe Complex Internal Processes that_
-_Drive Their Decisions, the data that we collected,
+_Drive Their Decisions_, the data that we collected,
 and the scripts that we used to analyze the data.
 
 ## Experiment Script
