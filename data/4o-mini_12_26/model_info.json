@@ -1,0 +1,16 @@
+{
+    "gpt-4o-mini-2024-07-18": {
+        "base": "gpt-4o-mini-2024-07-18",
+        "100_instilled_prefs_50ex": "ft:gpt-4o-mini-2024-07-18:personal:100-instilled-prefs-50ex:Cqt761Ex",
+        "itrained_first_50_of_100_50ex": "ft:gpt-4o-mini-2024-07-18:personal:itrained-first-50-of-100-50ex:CqtT2PR5",
+        "itrained_last_50_of_100_50ex": "ft:gpt-4o-mini-2024-07-18:personal:itrained-last-50-of-100-50ex:Cqtog909",
+        "itrained_all_100_50ex": "ft:gpt-4o-mini-2024-07-18:personal:itrained-all-100-50ex:CquB5zsg"
+    },
+    "gpt-4o-2024-08-06": {
+        "base": "gpt-4o-2024-08-06",
+        "100_instilled_prefs_50ex": "ft:gpt-4o-2024-08-06:personal:100-instilled-prefs-50ex:CqwaWdOo",
+        "itrained_first_50_of_100_50ex": "ft:gpt-4o-2024-08-06:personal:itrained-first-50-of-100-50ex:CqwzAvGy",
+        "itrained_last_50_of_100_50ex": "ft:gpt-4o-2024-08-06:personal:itrained-last-50-of-100-50ex:CqxOEkf2",
+        "itrained_all_100_50ex": "ft:gpt-4o-2024-08-06:personal:itrained-all-100-50ex:CqxneBG7"
+    }
+}

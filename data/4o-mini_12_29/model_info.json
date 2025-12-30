@@ -1,0 +1,9 @@
+{
+    "gpt-4o-mini-2024-07-18": {
+        "base": "gpt-4o-mini-2024-07-18",
+        "100_instilled_prefs_50ex": "ft:gpt-4o-mini-2024-07-18:personal:100-instilled-prefs-50ex:Cr4HgdP9",
+        "itrained_first_50_of_100_50ex": "ft:gpt-4o-mini-2024-07-18:personal:itrained-first-50-of-100-50ex:Cr4gzH3a",
+        "itrained_last_50_of_100_50ex": "ft:gpt-4o-mini-2024-07-18:personal:itrained-last-50-of-100-50ex:Cr53hSLf",
+        "itrained_all_100_50ex": "ft:gpt-4o-mini-2024-07-18:personal:itrained-all-100-50ex:Cr5QzjfP"
+    }
+}
