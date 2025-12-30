@@ -1,0 +1,68 @@
+Processing trials: 100%|██████████| 1000/1000 [01:09<00:00, 14.47it/s]
+Attribute caffeine not found in scenario loose_leaf_tea
+Attribute caffeine not found in scenario loose_leaf_tea
+Attribute caffeine not found in scenario loose_leaf_tea
+Attribute Aesthetic not found in scenario loose_leaf_tea
+Attribute caffeine not found in scenario loose_leaf_tea
+Attribute caffeine not found in scenario loose_leaf_tea
+Attribute caffeine not found in scenario loose_leaf_tea
+Attribute caffeine not found in scenario loose_leaf_tea
+Attribute CULTURE not found in scenario loose_leaf_tea
+Expected 5 keys, got 3
+Expected 5 keys, got 3
+Attribute thickness not found in scenario cutting_board
+Attribute thickness not found in scenario cutting_board
+Expected 5 keys, got 3
+Attribute comfort not found in scenario knee_pads
+Attribute comfort not found in scenario knee_pads
+Attribute comfort not found in scenario knee_pads
+Attribute safety not found in scenario knee_pads
+Attribute comfort not found in scenario knee_pads
+Attribute safety not found in scenario knee_pads
+Attribute comfort not found in scenario knee_pads
+Attribute safety not found in scenario knee_pads
+Attribute safety not found in scenario knee_pads
+Attribute comfort not found in scenario knee_pads
+Attribute creativity not found in scenario ice_cream
+...
+Attribute stability not found in scenario necklace_stand
+Attribute stability not found in scenario necklace_stand
+Attribute A not found in scenario necklace_stand
+908 bad reports out of 1000 total
+
+@gpt-4o-mini-2024-07-18_instilled_weight_reports.csv
+
+
+Processing trials: 100%|██████████| 1000/1000 [01:03<00:00, 15.69it/s]
+Attribute A not found in scenario cake_pan
+Attribute A not found in scenario cake_pan
+Attribute A not found in scenario cake_pan
+Attribute creativity not found in scenario cake_pan
+Attribute A not found in scenario cake_pan
+Attribute openness not found in scenario cake_pan
+Attribute A not found in scenario cake_pan
+Attribute A not found in scenario cake_pan
+Attribute Aesthetic not found in scenario cake_pan
+Expected 5 keys, got 2
+Attribute openness not found in scenario pin_cushion
+Expected 5 keys, got 2
+Attribute stability not found in scenario pin_cushion
+Attribute A not found in scenario pin_cushion
+Attribute openness not found in scenario pin_cushion
+Attribute A not found in scenario pin_cushion
+Expected 5 keys, got 2
+Attribute stability not found in scenario pin_cushion
+Attribute stability not found in scenario pin_cushion
+Attribute stability not found in scenario pin_cushion
+Attribute openness not found in scenario sugar_bowl
+Attribute stability not found in scenario sugar_bowl
+Attribute stability not found in scenario sugar_bowl
+Attribute A not found in scenario sugar_bowl
+Attribute A not found in scenario sugar_bowl
+...
+Attribute A not found in scenario landscape_lighting
+Attribute A not found in scenario landscape_lighting
+Attribute Aesthetic not found in scenario landscape_lighting
+907 bad reports out of 1000 total
+
+@gpt-4o-mini-2024-07-18_instilled_latent_weight_reports.csv

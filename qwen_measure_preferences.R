@@ -32,7 +32,7 @@ analyze_model <- function(
     model_name,
     latent = FALSE,
     n_workers = 6) {
-  selections_path <- paste0("data/qwen/", model_name, "_instilled_selections.csv")
+  selections_path <- paste0("data/", model_name, "_instilled_selections.csv")
   if (latent) {
     selections_path <- str_replace(selections_path, "selections", "latent_selections")
   }
@@ -167,7 +167,7 @@ analyze_model <- function(
     select(-max_abs_idx, -max_signed, -max_sign)
 
   # Save results.
-  outfile_path <- paste0("data/qwen/", model_name, "_regression_results.csv")
+  outfile_path <- paste0("data/", model_name, "_regression_results.csv")
   if (latent) {
     outfile_path <- str_replace(outfile_path, "regression", "latent_regression")
   }

@@ -51,7 +51,7 @@ instilled_parameters <-
 # Load the results of the regressions validating that the preferences were learned.
 instilled_regression_results <-
   map_dfr(base_models, function(model) {
-    read_csv(paste0("data/qwen/", model, "_regression_results.csv")) %>%
+    read_csv(paste0("data/", model, "_regression_results.csv")) %>%
       mutate(base_model = model)
   }) %>%
   pivot_longer(
@@ -75,12 +75,12 @@ learned_cors
 # Load and tidy the models' introspective reports.
 weight_reports <-
   bind_rows(
-    map_dfr(base_models, ~ read_csv(str_glue("data/qwen/{.x}_weight_reports.csv"))),
-    map_dfr(base_models, ~ read_csv(str_glue("data/qwen/{.x}_instilled_weight_reports.csv"))),
-    map_dfr(base_models, ~ read_csv(str_glue("data/qwen/{.x}_itrained_first_50_of_100_50ex_weight_reports.csv"))),
-    map_dfr(base_models, ~ read_csv(str_glue("data/qwen/{.x}_itrained_last_50_of_100_50ex_weight_reports.csv"))),
-    map_dfr(base_models, ~ read_csv(str_glue("data/qwen/{.x}_instilled_latent_weight_reports.csv"))),
-    map_dfr(base_models, ~ read_csv(str_glue("data/qwen/{.x}_itrained_all_100_50ex_latent_weight_reports.csv"))),
+    map_dfr(base_models, ~ read_csv(str_glue("data/{.x}_weight_reports.csv"))),
+    map_dfr(base_models, ~ read_csv(str_glue("data/{.x}_instilled_weight_reports.csv"))),
+    map_dfr(base_models, ~ read_csv(str_glue("data/{.x}_itrained_first_50_of_100_50ex_weight_reports.csv"))),
+    map_dfr(base_models, ~ read_csv(str_glue("data/{.x}_itrained_last_50_of_100_50ex_weight_reports.csv"))),
+    map_dfr(base_models, ~ read_csv(str_glue("data/{.x}_instilled_latent_weight_reports.csv"))),
+    map_dfr(base_models, ~ read_csv(str_glue("data/{.x}_itrained_all_100_50ex_latent_weight_reports.csv"))),
   )
 weight_reports_long <-
   weight_reports %>%
@@ -233,7 +233,7 @@ summary(itrain_cont, infer = c(TRUE, TRUE), level = 0.95)
 # Load native preferences.
 native_regression_results <-
   map_dfr(base_models, function(model) {
-    read_csv(paste0("data/qwen/", model, "_latent_regression_results.csv")) %>%
+    read_csv(paste0("data/", model, "_latent_regression_results.csv")) %>%
       mutate(model = model)
   }) %>%
   pivot_longer(

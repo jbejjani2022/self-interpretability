@@ -1,0 +1,1283 @@
+12/29/26
+
+> source("~/Projects/self-interpretability/effects.R", echo = TRUE)
+
+> # `Groundhog` will load the versions of the `R` packages used for the
+> # reported analyses. However, it cannot control the version of `R` that you  .... [TRUNCATED] 
+
+> pkgs <- c("tidyverse", "brms", "bayestestR", "emmeans")
+
+> groundhog.library(pkgs, "2025-01-15")
+Welcome to emmeans.
+Caution: You lose important information if you filter this package's results.
+See '? untidy'
+Had already  attached 'tidyverse_2.0.0'
+Had already  attached 'brms_2.22.0'
+Successfully attached 'bayestestR_0.15.0'
+Successfully attached 'emmeans_1.10.6'
+
+> # If you don't want to use `groundhog` or have issues with it, comment out the
+> # code above and run the following code instead. Note that you will .... [TRUNCATED] 
+
+> base_models <- c(
++   "gpt-4o-mini-2024-07-18",
++   "gpt-4o-2024-08-06"
++ )
+
+> instilled_parameters <-
++   read_csv("data/instilled_weights.csv") %>%
++   slice(1:100) %>%
++   pivot_longer(
++     cols = starts_with("attr"),
++    .... [TRUNCATED] 
+Rows: 1100 Columns: 6                                                                                                                   
+── Column specification ────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+Delimiter: ","
+chr (1): scenario
+dbl (5): attr1, attr2, attr3, attr4, attr5
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+
+> # Load the results of the regressions validating that the preferences were learned.
+> instilled_regression_results <-
++   map_dfr(base_models, funct .... [TRUNCATED] 
+Rows: 100 Columns: 6                                                                                                                    
+── Column specification ────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+Delimiter: ","
+chr (1): scenario
+dbl (5): b_attr1, b_attr2, b_attr3, b_attr4, b_attr5
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+Rows: 100 Columns: 6                                                                                                                    
+── Column specification ────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+Delimiter: ","
+chr (1): scenario
+dbl (5): b_attr1, b_attr2, b_attr3, b_attr4, b_attr5
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+
+> # Verify that the preferences were learned.
+> learned_cors <-
++   instilled_regression_results %>%
++   left_join(instilled_parameters) %>%
++   group .... [TRUNCATED] 
+Joining with `by = join_by(scenario, attr)`
+
+> learned_cors
+# A tibble: 2 × 2
+  base_model               cor
+  <chr>                  <dbl>
+1 gpt-4o-2024-08-06      0.843
+2 gpt-4o-mini-2024-07-18 0.815
+
+> # Load and tidy the models' introspective reports.
+> weight_reports <-
++   bind_rows(
++     map_dfr(base_models, ~ read_csv(str_glue("data/{.x}_weig ..." ... [TRUNCATED] 
+Rows: 882 Columns: 18                                                                                                                   
+── Column specification ────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+Delimiter: ","
+chr  (3): explaining_model, version, scenario
+dbl (15): report_attr1, report_attr2, report_attr3, report_attr4, report_attr5, A_attribute_1, A_attribute_2, A_attribute_3, A_attri...
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+Rows: 1000 Columns: 18                                                                                                                  
+── Column specification ────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+Delimiter: ","
+chr  (3): explaining_model, version, scenario
+dbl (15): report_attr1, report_attr2, report_attr3, report_attr4, report_attr5, A_attribute_1, A_attribute_2, A_attribute_3, A_attri...
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+Rows: 92 Columns: 18                                                                                                                    
+── Column specification ────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+Delimiter: ","
+chr  (3): explaining_model, version, scenario
+dbl (15): report_attr1, report_attr2, report_attr3, report_attr4, report_attr5, A_attribute_1, A_attribute_2, A_attribute_3, A_attri...
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+Rows: 1000 Columns: 18                                                                                                                  
+── Column specification ────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+Delimiter: ","
+chr  (3): explaining_model, version, scenario
+dbl (15): report_attr1, report_attr2, report_attr3, report_attr4, report_attr5, A_attribute_1, A_attribute_2, A_attribute_3, A_attri...
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+Rows: 500 Columns: 18                                                                                                                   
+── Column specification ────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+Delimiter: ","
+chr  (3): explaining_model, version, scenario
+dbl (15): report_attr1, report_attr2, report_attr3, report_attr4, report_attr5, A_attribute_1, A_attribute_2, A_attribute_3, A_attri...
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+Rows: 500 Columns: 18                                                                                                                   
+── Column specification ────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+Delimiter: ","
+chr  (3): explaining_model, version, scenario
+dbl (15): report_attr1, report_attr2, report_attr3, report_attr4, report_attr5, A_attribute_1, A_attribute_2, A_attribute_3, A_attri...
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+Rows: 499 Columns: 18                                                                                                                   
+── Column specification ────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+Delimiter: ","
+chr  (3): explaining_model, version, scenario
+dbl (15): report_attr1, report_attr2, report_attr3, report_attr4, report_attr5, A_attribute_1, A_attribute_2, A_attribute_3, A_attri...
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+Rows: 500 Columns: 18                                                                                                                   
+── Column specification ────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+Delimiter: ","
+chr  (3): explaining_model, version, scenario
+dbl (15): report_attr1, report_attr2, report_attr3, report_attr4, report_attr5, A_attribute_1, A_attribute_2, A_attribute_3, A_attri...
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+Rows: 93 Columns: 18                                                                                                                    
+── Column specification ────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+Delimiter: ","
+chr  (3): explaining_model, version, scenario
+dbl (15): report_attr1, report_attr2, report_attr3, report_attr4, report_attr5, A_attribute_1, A_attribute_2, A_attribute_3, A_attri...
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+Rows: 966 Columns: 18                                                                                                                   
+── Column specification ────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+Delimiter: ","
+chr  (3): explaining_model, version, scenario
+dbl (15): report_attr1, report_attr2, report_attr3, report_attr4, report_attr5, A_attribute_1, A_attribute_2, A_attribute_3, A_attri...
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+Rows: 1000 Columns: 18                                                                                                                  
+── Column specification ────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+Delimiter: ","
+chr  (3): explaining_model, version, scenario
+dbl (15): report_attr1, report_attr2, report_attr3, report_attr4, report_attr5, A_attribute_1, A_attribute_2, A_attribute_3, A_attri...
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+Rows: 1000 Columns: 18                                                                                                                  
+── Column specification ────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+Delimiter: ","
+chr  (3): explaining_model, version, scenario
+dbl (15): report_attr1, report_attr2, report_attr3, report_attr4, report_attr5, A_attribute_1, A_attribute_2, A_attribute_3, A_attri...
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+
+> weight_reports_long <-
++   weight_reports %>%
++   rename(model = explaining_model) %>%
++   select(model, scenario, version, starts_with("report")) % .... [TRUNCATED] 
+
+> mean_reports <-
++   weight_reports_long %>%
++   group_by(model, version, scenario, attr) %>%
++   summarise(mean_report = mean(report)) %>%
++   ungro .... [TRUNCATED] 
+`summarise()` has grouped output by 'model', 'version', 'scenario'. You can override using the `.groups` argument.
+
+> # Check the accuracy of model reports (without training).
+> instilled_reports_data <-
++   mean_reports %>%
++   filter(version == "instilled_100") %> .... [TRUNCATED] 
+Joining with `by = join_by(scenario, attr, base_model)`
+
+> inst_models_inst_reports <-
++   instilled_reports_data %>%
++   filter(str_detect(model, "instilled"))
+
+> four_fit <-
++   brm(
++     formula = standardized_b ~ standardized_reports,
++     data = filter(inst_models_inst_reports, !str_detect(model, "mini") .... [TRUNCATED] 
+Compiling Stan program...
+Start sampling
+starting worker pid=80303 on localhost:11802 at 18:10:03.691
+starting worker pid=80316 on localhost:11802 at 18:10:03.775
+starting worker pid=80329 on localhost:11802 at 18:10:03.862
+starting worker pid=80342 on localhost:11802 at 18:10:03.936
+
+SAMPLING FOR MODEL 'anon_model' NOW (CHAIN 1).
+Chain 1: 
+Chain 1: Gradient evaluation took 1.2e-05 seconds
+Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 0.12 seconds.
+Chain 1: Adjust your expectations accordingly!
+Chain 1: 
+Chain 1: 
+Chain 1: Iteration:    1 / 2000 [  0%]  (Warmup)
+Chain 1: Iteration:  200 / 2000 [ 10%]  (Warmup)
+Chain 1: Iteration:  400 / 2000 [ 20%]  (Warmup)
+Chain 1: Iteration:  600 / 2000 [ 30%]  (Warmup)
+Chain 1: Iteration:  800 / 2000 [ 40%]  (Warmup)
+Chain 1: Iteration: 1000 / 2000 [ 50%]  (Warmup)
+Chain 1: Iteration: 1001 / 2000 [ 50%]  (Sampling)
+Chain 1: Iteration: 1200 / 2000 [ 60%]  (Sampling)
+Chain 1: Iteration: 1400 / 2000 [ 70%]  (Sampling)
+Chain 1: Iteration: 1600 / 2000 [ 80%]  (Sampling)
+Chain 1: Iteration: 1800 / 2000 [ 90%]  (Sampling)
+Chain 1: Iteration: 2000 / 2000 [100%]  (Sampling)
+Chain 1: 
+Chain 1:  Elapsed Time: 0.01 seconds (Warm-up)
+Chain 1:                0.009 seconds (Sampling)
+Chain 1:                0.019 seconds (Total)
+Chain 1: 
+
+SAMPLING FOR MODEL 'anon_model' NOW (CHAIN 2).
+Chain 2: 
+Chain 2: Gradient evaluation took 1.2e-05 seconds
+Chain 2: 1000 transitions using 10 leapfrog steps per transition would take 0.12 seconds.
+Chain 2: Adjust your expectations accordingly!
+Chain 2: 
+Chain 2: 
+Chain 2: Iteration:    1 / 2000 [  0%]  (Warmup)
+Chain 2: Iteration:  200 / 2000 [ 10%]  (Warmup)
+Chain 2: Iteration:  400 / 2000 [ 20%]  (Warmup)
+Chain 2: Iteration:  600 / 2000 [ 30%]  (Warmup)
+Chain 2: Iteration:  800 / 2000 [ 40%]  (Warmup)
+Chain 2: Iteration: 1000 / 2000 [ 50%]  (Warmup)
+Chain 2: Iteration: 1001 / 2000 [ 50%]  (Sampling)
+Chain 2: Iteration: 1200 / 2000 [ 60%]  (Sampling)
+Chain 2: Iteration: 1400 / 2000 [ 70%]  (Sampling)
+Chain 2: Iteration: 1600 / 2000 [ 80%]  (Sampling)
+Chain 2: Iteration: 1800 / 2000 [ 90%]  (Sampling)
+Chain 2: Iteration: 2000 / 2000 [100%]  (Sampling)
+Chain 2: 
+Chain 2:  Elapsed Time: 0.01 seconds (Warm-up)
+Chain 2:                0.022 seconds (Sampling)
+Chain 2:                0.032 seconds (Total)
+Chain 2: 
+
+SAMPLING FOR MODEL 'anon_model' NOW (CHAIN 3).
+Chain 3: 
+Chain 3: Gradient evaluation took 1.2e-05 seconds
+Chain 3: 1000 transitions using 10 leapfrog steps per transition would take 0.12 seconds.
+Chain 3: Adjust your expectations accordingly!
+Chain 3: 
+Chain 3: 
+Chain 3: Iteration:    1 / 2000 [  0%]  (Warmup)
+Chain 3: Iteration:  200 / 2000 [ 10%]  (Warmup)
+Chain 3: Iteration:  400 / 2000 [ 20%]  (Warmup)
+Chain 3: Iteration:  600 / 2000 [ 30%]  (Warmup)
+Chain 3: Iteration:  800 / 2000 [ 40%]  (Warmup)
+Chain 3: Iteration: 1000 / 2000 [ 50%]  (Warmup)
+Chain 3: Iteration: 1001 / 2000 [ 50%]  (Sampling)
+Chain 3: Iteration: 1200 / 2000 [ 60%]  (Sampling)
+Chain 3: Iteration: 1400 / 2000 [ 70%]  (Sampling)
+Chain 3: Iteration: 1600 / 2000 [ 80%]  (Sampling)
+Chain 3: Iteration: 1800 / 2000 [ 90%]  (Sampling)
+Chain 3: Iteration: 2000 / 2000 [100%]  (Sampling)
+Chain 3: 
+Chain 3:  Elapsed Time: 0.01 seconds (Warm-up)
+Chain 3:                0.01 seconds (Sampling)
+Chain 3:                0.02 seconds (Total)
+Chain 3: 
+
+SAMPLING FOR MODEL 'anon_model' NOW (CHAIN 4).
+Chain 4: 
+Chain 4: Gradient evaluation took 1.5e-05 seconds
+Chain 4: 1000 transitions using 10 leapfrog steps per transition would take 0.15 seconds.
+Chain 4: Adjust your expectations accordingly!
+Chain 4: 
+Chain 4: 
+Chain 4: Iteration:    1 / 2000 [  0%]  (Warmup)
+Chain 4: Iteration:  200 / 2000 [ 10%]  (Warmup)
+Chain 4: Iteration:  400 / 2000 [ 20%]  (Warmup)
+Chain 4: Iteration:  600 / 2000 [ 30%]  (Warmup)
+Chain 4: Iteration:  800 / 2000 [ 40%]  (Warmup)
+Chain 4: Iteration: 1000 / 2000 [ 50%]  (Warmup)
+Chain 4: Iteration: 1001 / 2000 [ 50%]  (Sampling)
+Chain 4: Iteration: 1200 / 2000 [ 60%]  (Sampling)
+Chain 4: Iteration: 1400 / 2000 [ 70%]  (Sampling)
+Chain 4: Iteration: 1600 / 2000 [ 80%]  (Sampling)
+Chain 4: Iteration: 1800 / 2000 [ 90%]  (Sampling)
+Chain 4: Iteration: 2000 / 2000 [100%]  (Sampling)
+Chain 4: 
+Chain 4:  Elapsed Time: 0.01 seconds (Warm-up)
+Chain 4:                0.009 seconds (Sampling)
+Chain 4:                0.019 seconds (Total)
+Chain 4: 
+Warning message:
+package ‘StanHeaders’ was built under R version 4.4.1 
+Warning message:
+package ‘StanHeaders’ was built under R version 4.4.1 
+Warning message:
+package ‘StanHeaders’ was built under R version 4.4.1 
+Warning message:
+package ‘StanHeaders’ was built under R version 4.4.1 
+
+> describe_posterior(four_fit)
+Summary of Posterior Distribution 
+
+Parameter            |   Median |        95% CI |     pd |          ROPE | % in ROPE |  Rhat |     ESS
+------------------------------------------------------------------------------------------------------
+(Intercept)          | 9.29e-04 | [-0.07, 0.07] | 50.98% | [-0.10, 0.10] |      100% | 1.000 | 3905.00
+standardized_reports |     0.54 | [ 0.47, 0.62] |   100% | [-0.10, 0.10] |        0% | 0.999 | 4007.00
+
+> hdi(four_fit)
+Highest Density Interval 
+
+Parameter            |       95% HDI
+------------------------------------
+(Intercept)          | [-0.07, 0.07]
+standardized_reports | [ 0.47, 0.62]
+
+> mini_fit <-
++   update(
++     four_fit,
++     newdata = filter(inst_models_inst_reports, str_detect(model, "mini"))
++   )
+Start sampling
+
+SAMPLING FOR MODEL 'anon_model' NOW (CHAIN 1).
+Chain 1: 
+Chain 1: Gradient evaluation took 1.4e-05 seconds
+Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 0.14 seconds.
+Chain 1: Adjust your expectations accordingly!
+Chain 1: 
+Chain 1: 
+Chain 1: Iteration:    1 / 2000 [  0%]  (Warmup)
+Chain 1: Iteration:  200 / 2000 [ 10%]  (Warmup)
+Chain 1: Iteration:  400 / 2000 [ 20%]  (Warmup)
+Chain 1: Iteration:  600 / 2000 [ 30%]  (Warmup)
+Chain 1: Iteration:  800 / 2000 [ 40%]  (Warmup)
+Chain 1: Iteration: 1000 / 2000 [ 50%]  (Warmup)
+Chain 1: Iteration: 1001 / 2000 [ 50%]  (Sampling)
+Chain 1: Iteration: 1200 / 2000 [ 60%]  (Sampling)
+Chain 1: Iteration: 1400 / 2000 [ 70%]  (Sampling)
+Chain 1: Iteration: 1600 / 2000 [ 80%]  (Sampling)
+Chain 1: Iteration: 1800 / 2000 [ 90%]  (Sampling)
+Chain 1: Iteration: 2000 / 2000 [100%]  (Sampling)
+Chain 1: 
+Chain 1:  Elapsed Time: 0.01 seconds (Warm-up)
+Chain 1:                0.008 seconds (Sampling)
+Chain 1:                0.018 seconds (Total)
+Chain 1: 
+
+SAMPLING FOR MODEL 'anon_model' NOW (CHAIN 2).
+Chain 2: 
+Chain 2: Gradient evaluation took 1e-06 seconds
+Chain 2: 1000 transitions using 10 leapfrog steps per transition would take 0.01 seconds.
+Chain 2: Adjust your expectations accordingly!
+Chain 2: 
+Chain 2: 
+Chain 2: Iteration:    1 / 2000 [  0%]  (Warmup)
+Chain 2: Iteration:  200 / 2000 [ 10%]  (Warmup)
+Chain 2: Iteration:  400 / 2000 [ 20%]  (Warmup)
+Chain 2: Iteration:  600 / 2000 [ 30%]  (Warmup)
+Chain 2: Iteration:  800 / 2000 [ 40%]  (Warmup)
+Chain 2: Iteration: 1000 / 2000 [ 50%]  (Warmup)
+Chain 2: Iteration: 1001 / 2000 [ 50%]  (Sampling)
+Chain 2: Iteration: 1200 / 2000 [ 60%]  (Sampling)
+Chain 2: Iteration: 1400 / 2000 [ 70%]  (Sampling)
+Chain 2: Iteration: 1600 / 2000 [ 80%]  (Sampling)
+Chain 2: Iteration: 1800 / 2000 [ 90%]  (Sampling)
+Chain 2: Iteration: 2000 / 2000 [100%]  (Sampling)
+Chain 2: 
+Chain 2:  Elapsed Time: 0.009 seconds (Warm-up)
+Chain 2:                0.008 seconds (Sampling)
+Chain 2:                0.017 seconds (Total)
+Chain 2: 
+
+SAMPLING FOR MODEL 'anon_model' NOW (CHAIN 3).
+Chain 3: 
+Chain 3: Gradient evaluation took 1e-06 seconds
+Chain 3: 1000 transitions using 10 leapfrog steps per transition would take 0.01 seconds.
+Chain 3: Adjust your expectations accordingly!
+Chain 3: 
+Chain 3: 
+Chain 3: Iteration:    1 / 2000 [  0%]  (Warmup)
+Chain 3: Iteration:  200 / 2000 [ 10%]  (Warmup)
+Chain 3: Iteration:  400 / 2000 [ 20%]  (Warmup)
+Chain 3: Iteration:  600 / 2000 [ 30%]  (Warmup)
+Chain 3: Iteration:  800 / 2000 [ 40%]  (Warmup)
+Chain 3: Iteration: 1000 / 2000 [ 50%]  (Warmup)
+Chain 3: Iteration: 1001 / 2000 [ 50%]  (Sampling)
+Chain 3: Iteration: 1200 / 2000 [ 60%]  (Sampling)
+Chain 3: Iteration: 1400 / 2000 [ 70%]  (Sampling)
+Chain 3: Iteration: 1600 / 2000 [ 80%]  (Sampling)
+Chain 3: Iteration: 1800 / 2000 [ 90%]  (Sampling)
+Chain 3: Iteration: 2000 / 2000 [100%]  (Sampling)
+Chain 3: 
+Chain 3:  Elapsed Time: 0.009 seconds (Warm-up)
+Chain 3:                0.008 seconds (Sampling)
+Chain 3:                0.017 seconds (Total)
+Chain 3: 
+
+SAMPLING FOR MODEL 'anon_model' NOW (CHAIN 4).
+Chain 4: 
+Chain 4: Gradient evaluation took 2e-06 seconds
+Chain 4: 1000 transitions using 10 leapfrog steps per transition would take 0.02 seconds.
+Chain 4: Adjust your expectations accordingly!
+Chain 4: 
+Chain 4: 
+Chain 4: Iteration:    1 / 2000 [  0%]  (Warmup)
+Chain 4: Iteration:  200 / 2000 [ 10%]  (Warmup)
+Chain 4: Iteration:  400 / 2000 [ 20%]  (Warmup)
+Chain 4: Iteration:  600 / 2000 [ 30%]  (Warmup)
+Chain 4: Iteration:  800 / 2000 [ 40%]  (Warmup)
+Chain 4: Iteration: 1000 / 2000 [ 50%]  (Warmup)
+Chain 4: Iteration: 1001 / 2000 [ 50%]  (Sampling)
+Chain 4: Iteration: 1200 / 2000 [ 60%]  (Sampling)
+Chain 4: Iteration: 1400 / 2000 [ 70%]  (Sampling)
+Chain 4: Iteration: 1600 / 2000 [ 80%]  (Sampling)
+Chain 4: Iteration: 1800 / 2000 [ 90%]  (Sampling)
+Chain 4: Iteration: 2000 / 2000 [100%]  (Sampling)
+Chain 4: 
+Chain 4:  Elapsed Time: 0.02 seconds (Warm-up)
+Chain 4:                0.011 seconds (Sampling)
+Chain 4:                0.031 seconds (Total)
+Chain 4: 
+
+> describe_posterior(mini_fit)
+Summary of Posterior Distribution 
+
+Parameter            | Median |        95% CI |     pd |          ROPE | % in ROPE |  Rhat |     ESS
+----------------------------------------------------------------------------------------------------
+(Intercept)          |   0.13 | [-0.05, 0.31] | 92.85% | [-0.10, 0.10] |    33.24% | 0.999 | 4063.00
+standardized_reports |   0.13 | [-0.05, 0.30] | 92.27% | [-0.10, 0.10] |    37.58% | 1.000 | 3587.00
+
+> hdi(mini_fit)
+Highest Density Interval 
+
+Parameter            |       95% HDI
+------------------------------------
+(Intercept)          | [-0.04, 0.32]
+standardized_reports | [-0.05, 0.30]
+
+> # Verify that the learned preferences are nearly uncorrelated with the base
+> # models' reports.
+> base_models_reports <-
++   instilled_reports_data .... [TRUNCATED] 
+
+> four_base_fit <-
++   update(
++     four_fit,
++     newdata = filter(base_models_reports, !str_detect(model, "mini"))
++   )
+Start sampling
+
+SAMPLING FOR MODEL 'anon_model' NOW (CHAIN 1).
+Chain 1: 
+Chain 1: Gradient evaluation took 4e-06 seconds
+Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 0.04 seconds.
+Chain 1: Adjust your expectations accordingly!
+Chain 1: 
+Chain 1: 
+Chain 1: Iteration:    1 / 2000 [  0%]  (Warmup)
+Chain 1: Iteration:  200 / 2000 [ 10%]  (Warmup)
+Chain 1: Iteration:  400 / 2000 [ 20%]  (Warmup)
+Chain 1: Iteration:  600 / 2000 [ 30%]  (Warmup)
+Chain 1: Iteration:  800 / 2000 [ 40%]  (Warmup)
+Chain 1: Iteration: 1000 / 2000 [ 50%]  (Warmup)
+Chain 1: Iteration: 1001 / 2000 [ 50%]  (Sampling)
+Chain 1: Iteration: 1200 / 2000 [ 60%]  (Sampling)
+Chain 1: Iteration: 1400 / 2000 [ 70%]  (Sampling)
+Chain 1: Iteration: 1600 / 2000 [ 80%]  (Sampling)
+Chain 1: Iteration: 1800 / 2000 [ 90%]  (Sampling)
+Chain 1: Iteration: 2000 / 2000 [100%]  (Sampling)
+Chain 1: 
+Chain 1:  Elapsed Time: 0.013 seconds (Warm-up)
+Chain 1:                0.014 seconds (Sampling)
+Chain 1:                0.027 seconds (Total)
+Chain 1: 
+
+SAMPLING FOR MODEL 'anon_model' NOW (CHAIN 2).
+Chain 2: 
+Chain 2: Gradient evaluation took 4e-06 seconds
+Chain 2: 1000 transitions using 10 leapfrog steps per transition would take 0.04 seconds.
+Chain 2: Adjust your expectations accordingly!
+Chain 2: 
+Chain 2: 
+Chain 2: Iteration:    1 / 2000 [  0%]  (Warmup)
+Chain 2: Iteration:  200 / 2000 [ 10%]  (Warmup)
+Chain 2: Iteration:  400 / 2000 [ 20%]  (Warmup)
+Chain 2: Iteration:  600 / 2000 [ 30%]  (Warmup)
+Chain 2: Iteration:  800 / 2000 [ 40%]  (Warmup)
+Chain 2: Iteration: 1000 / 2000 [ 50%]  (Warmup)
+Chain 2: Iteration: 1001 / 2000 [ 50%]  (Sampling)
+Chain 2: Iteration: 1200 / 2000 [ 60%]  (Sampling)
+Chain 2: Iteration: 1400 / 2000 [ 70%]  (Sampling)
+Chain 2: Iteration: 1600 / 2000 [ 80%]  (Sampling)
+Chain 2: Iteration: 1800 / 2000 [ 90%]  (Sampling)
+Chain 2: Iteration: 2000 / 2000 [100%]  (Sampling)
+Chain 2: 
+Chain 2:  Elapsed Time: 0.014 seconds (Warm-up)
+Chain 2:                0.009 seconds (Sampling)
+Chain 2:                0.023 seconds (Total)
+Chain 2: 
+
+SAMPLING FOR MODEL 'anon_model' NOW (CHAIN 3).
+Chain 3: 
+Chain 3: Gradient evaluation took 2e-06 seconds
+Chain 3: 1000 transitions using 10 leapfrog steps per transition would take 0.02 seconds.
+Chain 3: Adjust your expectations accordingly!
+Chain 3: 
+Chain 3: 
+Chain 3: Iteration:    1 / 2000 [  0%]  (Warmup)
+Chain 3: Iteration:  200 / 2000 [ 10%]  (Warmup)
+Chain 3: Iteration:  400 / 2000 [ 20%]  (Warmup)
+Chain 3: Iteration:  600 / 2000 [ 30%]  (Warmup)
+Chain 3: Iteration:  800 / 2000 [ 40%]  (Warmup)
+Chain 3: Iteration: 1000 / 2000 [ 50%]  (Warmup)
+Chain 3: Iteration: 1001 / 2000 [ 50%]  (Sampling)
+Chain 3: Iteration: 1200 / 2000 [ 60%]  (Sampling)
+Chain 3: Iteration: 1400 / 2000 [ 70%]  (Sampling)
+Chain 3: Iteration: 1600 / 2000 [ 80%]  (Sampling)
+Chain 3: Iteration: 1800 / 2000 [ 90%]  (Sampling)
+Chain 3: Iteration: 2000 / 2000 [100%]  (Sampling)
+Chain 3: 
+Chain 3:  Elapsed Time: 0.011 seconds (Warm-up)
+Chain 3:                0.01 seconds (Sampling)
+Chain 3:                0.021 seconds (Total)
+Chain 3: 
+
+SAMPLING FOR MODEL 'anon_model' NOW (CHAIN 4).
+Chain 4: 
+Chain 4: Gradient evaluation took 2e-06 seconds
+Chain 4: 1000 transitions using 10 leapfrog steps per transition would take 0.02 seconds.
+Chain 4: Adjust your expectations accordingly!
+Chain 4: 
+Chain 4: 
+Chain 4: Iteration:    1 / 2000 [  0%]  (Warmup)
+Chain 4: Iteration:  200 / 2000 [ 10%]  (Warmup)
+Chain 4: Iteration:  400 / 2000 [ 20%]  (Warmup)
+Chain 4: Iteration:  600 / 2000 [ 30%]  (Warmup)
+Chain 4: Iteration:  800 / 2000 [ 40%]  (Warmup)
+Chain 4: Iteration: 1000 / 2000 [ 50%]  (Warmup)
+Chain 4: Iteration: 1001 / 2000 [ 50%]  (Sampling)
+Chain 4: Iteration: 1200 / 2000 [ 60%]  (Sampling)
+Chain 4: Iteration: 1400 / 2000 [ 70%]  (Sampling)
+Chain 4: Iteration: 1600 / 2000 [ 80%]  (Sampling)
+Chain 4: Iteration: 1800 / 2000 [ 90%]  (Sampling)
+Chain 4: Iteration: 2000 / 2000 [100%]  (Sampling)
+Chain 4: 
+Chain 4:  Elapsed Time: 0.011 seconds (Warm-up)
+Chain 4:                0.021 seconds (Sampling)
+Chain 4:                0.032 seconds (Total)
+Chain 4: 
+
+> describe_posterior(four_base_fit)
+Summary of Posterior Distribution 
+
+Parameter            |    Median |        95% CI |     pd |          ROPE | % in ROPE |  Rhat |     ESS
+-------------------------------------------------------------------------------------------------------
+(Intercept)          | -7.33e-04 | [-0.09, 0.09] | 50.52% | [-0.10, 0.10] |      100% | 1.000 | 3824.00
+standardized_reports |      0.10 | [ 0.01, 0.19] | 98.52% | [-0.10, 0.10] |    48.58% | 1.000 | 4029.00
+
+> hdi(four_base_fit)
+Highest Density Interval 
+
+Parameter            |       95% HDI
+------------------------------------
+(Intercept)          | [-0.09, 0.08]
+standardized_reports | [ 0.01, 0.19]
+
+> mini_base_fit <-
++   update(
++     four_base_fit,
++     newdata = filter(base_models_reports, str_detect(model, "mini"))
++   )
+Start sampling
+
+SAMPLING FOR MODEL 'anon_model' NOW (CHAIN 1).
+Chain 1: 
+Chain 1: Gradient evaluation took 6e-06 seconds
+Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 0.06 seconds.
+Chain 1: Adjust your expectations accordingly!
+Chain 1: 
+Chain 1: 
+Chain 1: Iteration:    1 / 2000 [  0%]  (Warmup)
+Chain 1: Iteration:  200 / 2000 [ 10%]  (Warmup)
+Chain 1: Iteration:  400 / 2000 [ 20%]  (Warmup)
+Chain 1: Iteration:  600 / 2000 [ 30%]  (Warmup)
+Chain 1: Iteration:  800 / 2000 [ 40%]  (Warmup)
+Chain 1: Iteration: 1000 / 2000 [ 50%]  (Warmup)
+Chain 1: Iteration: 1001 / 2000 [ 50%]  (Sampling)
+Chain 1: Iteration: 1200 / 2000 [ 60%]  (Sampling)
+Chain 1: Iteration: 1400 / 2000 [ 70%]  (Sampling)
+Chain 1: Iteration: 1600 / 2000 [ 80%]  (Sampling)
+Chain 1: Iteration: 1800 / 2000 [ 90%]  (Sampling)
+Chain 1: Iteration: 2000 / 2000 [100%]  (Sampling)
+Chain 1: 
+Chain 1:  Elapsed Time: 0.01 seconds (Warm-up)
+Chain 1:                0.023 seconds (Sampling)
+Chain 1:                0.033 seconds (Total)
+Chain 1: 
+
+SAMPLING FOR MODEL 'anon_model' NOW (CHAIN 2).
+Chain 2: 
+Chain 2: Gradient evaluation took 2e-06 seconds
+Chain 2: 1000 transitions using 10 leapfrog steps per transition would take 0.02 seconds.
+Chain 2: Adjust your expectations accordingly!
+Chain 2: 
+Chain 2: 
+Chain 2: Iteration:    1 / 2000 [  0%]  (Warmup)
+Chain 2: Iteration:  200 / 2000 [ 10%]  (Warmup)
+Chain 2: Iteration:  400 / 2000 [ 20%]  (Warmup)
+Chain 2: Iteration:  600 / 2000 [ 30%]  (Warmup)
+Chain 2: Iteration:  800 / 2000 [ 40%]  (Warmup)
+Chain 2: Iteration: 1000 / 2000 [ 50%]  (Warmup)
+Chain 2: Iteration: 1001 / 2000 [ 50%]  (Sampling)
+Chain 2: Iteration: 1200 / 2000 [ 60%]  (Sampling)
+Chain 2: Iteration: 1400 / 2000 [ 70%]  (Sampling)
+Chain 2: Iteration: 1600 / 2000 [ 80%]  (Sampling)
+Chain 2: Iteration: 1800 / 2000 [ 90%]  (Sampling)
+Chain 2: Iteration: 2000 / 2000 [100%]  (Sampling)
+Chain 2: 
+Chain 2:  Elapsed Time: 0.013 seconds (Warm-up)
+Chain 2:                0.008 seconds (Sampling)
+Chain 2:                0.021 seconds (Total)
+Chain 2: 
+
+SAMPLING FOR MODEL 'anon_model' NOW (CHAIN 3).
+Chain 3: 
+Chain 3: Gradient evaluation took 2e-06 seconds
+Chain 3: 1000 transitions using 10 leapfrog steps per transition would take 0.02 seconds.
+Chain 3: Adjust your expectations accordingly!
+Chain 3: 
+Chain 3: 
+Chain 3: Iteration:    1 / 2000 [  0%]  (Warmup)
+Chain 3: Iteration:  200 / 2000 [ 10%]  (Warmup)
+Chain 3: Iteration:  400 / 2000 [ 20%]  (Warmup)
+Chain 3: Iteration:  600 / 2000 [ 30%]  (Warmup)
+Chain 3: Iteration:  800 / 2000 [ 40%]  (Warmup)
+Chain 3: Iteration: 1000 / 2000 [ 50%]  (Warmup)
+Chain 3: Iteration: 1001 / 2000 [ 50%]  (Sampling)
+Chain 3: Iteration: 1200 / 2000 [ 60%]  (Sampling)
+Chain 3: Iteration: 1400 / 2000 [ 70%]  (Sampling)
+Chain 3: Iteration: 1600 / 2000 [ 80%]  (Sampling)
+Chain 3: Iteration: 1800 / 2000 [ 90%]  (Sampling)
+Chain 3: Iteration: 2000 / 2000 [100%]  (Sampling)
+Chain 3: 
+Chain 3:  Elapsed Time: 0.012 seconds (Warm-up)
+Chain 3:                0.01 seconds (Sampling)
+Chain 3:                0.022 seconds (Total)
+Chain 3: 
+
+SAMPLING FOR MODEL 'anon_model' NOW (CHAIN 4).
+Chain 4: 
+Chain 4: Gradient evaluation took 2e-06 seconds
+Chain 4: 1000 transitions using 10 leapfrog steps per transition would take 0.02 seconds.
+Chain 4: Adjust your expectations accordingly!
+Chain 4: 
+Chain 4: 
+Chain 4: Iteration:    1 / 2000 [  0%]  (Warmup)
+Chain 4: Iteration:  200 / 2000 [ 10%]  (Warmup)
+Chain 4: Iteration:  400 / 2000 [ 20%]  (Warmup)
+Chain 4: Iteration:  600 / 2000 [ 30%]  (Warmup)
+Chain 4: Iteration:  800 / 2000 [ 40%]  (Warmup)
+Chain 4: Iteration: 1000 / 2000 [ 50%]  (Warmup)
+Chain 4: Iteration: 1001 / 2000 [ 50%]  (Sampling)
+Chain 4: Iteration: 1200 / 2000 [ 60%]  (Sampling)
+Chain 4: Iteration: 1400 / 2000 [ 70%]  (Sampling)
+Chain 4: Iteration: 1600 / 2000 [ 80%]  (Sampling)
+Chain 4: Iteration: 1800 / 2000 [ 90%]  (Sampling)
+Chain 4: Iteration: 2000 / 2000 [100%]  (Sampling)
+Chain 4: 
+Chain 4:  Elapsed Time: 0.011 seconds (Warm-up)
+Chain 4:                0.026 seconds (Sampling)
+Chain 4:                0.037 seconds (Total)
+Chain 4: 
+
+> describe_posterior(mini_base_fit)
+Summary of Posterior Distribution 
+
+Parameter            | Median |        95% CI |     pd |          ROPE | % in ROPE |  Rhat |     ESS
+----------------------------------------------------------------------------------------------------
+(Intercept)          |  -0.01 | [-0.10, 0.08] | 60.02% | [-0.10, 0.10] |    99.39% | 0.999 | 3798.00
+standardized_reports |   0.09 | [-0.01, 0.18] | 96.78% | [-0.10, 0.10] |    60.97% | 0.999 | 4535.00
+
+> hdi(mini_base_fit)
+Highest Density Interval 
+
+Parameter            |       95% HDI
+------------------------------------
+(Intercept)          | [-0.10, 0.08]
+standardized_reports | [ 0.00, 0.18]
+
+> # Check if training did anything.
+> itrained_instilled_reports <-
++   instilled_reports_data %>%
++   filter(str_detect(model, "itrained"))
+
+> itrained_four_fit <-
++   update(
++     four_fit,
++     newdata = filter(itrained_instilled_reports, !str_detect(base_model, "mini"))
++   )
+Start sampling
+
+SAMPLING FOR MODEL 'anon_model' NOW (CHAIN 1).
+Chain 1: 
+Chain 1: Gradient evaluation took 4e-06 seconds
+Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 0.04 seconds.
+Chain 1: Adjust your expectations accordingly!
+Chain 1: 
+Chain 1: 
+Chain 1: Iteration:    1 / 2000 [  0%]  (Warmup)
+Chain 1: Iteration:  200 / 2000 [ 10%]  (Warmup)
+Chain 1: Iteration:  400 / 2000 [ 20%]  (Warmup)
+Chain 1: Iteration:  600 / 2000 [ 30%]  (Warmup)
+Chain 1: Iteration:  800 / 2000 [ 40%]  (Warmup)
+Chain 1: Iteration: 1000 / 2000 [ 50%]  (Warmup)
+Chain 1: Iteration: 1001 / 2000 [ 50%]  (Sampling)
+Chain 1: Iteration: 1200 / 2000 [ 60%]  (Sampling)
+Chain 1: Iteration: 1400 / 2000 [ 70%]  (Sampling)
+Chain 1: Iteration: 1600 / 2000 [ 80%]  (Sampling)
+Chain 1: Iteration: 1800 / 2000 [ 90%]  (Sampling)
+Chain 1: Iteration: 2000 / 2000 [100%]  (Sampling)
+Chain 1: 
+Chain 1:  Elapsed Time: 0.009 seconds (Warm-up)
+Chain 1:                0.009 seconds (Sampling)
+Chain 1:                0.018 seconds (Total)
+Chain 1: 
+
+SAMPLING FOR MODEL 'anon_model' NOW (CHAIN 2).
+Chain 2: 
+Chain 2: Gradient evaluation took 1e-06 seconds
+Chain 2: 1000 transitions using 10 leapfrog steps per transition would take 0.01 seconds.
+Chain 2: Adjust your expectations accordingly!
+Chain 2: 
+Chain 2: 
+Chain 2: Iteration:    1 / 2000 [  0%]  (Warmup)
+Chain 2: Iteration:  200 / 2000 [ 10%]  (Warmup)
+Chain 2: Iteration:  400 / 2000 [ 20%]  (Warmup)
+Chain 2: Iteration:  600 / 2000 [ 30%]  (Warmup)
+Chain 2: Iteration:  800 / 2000 [ 40%]  (Warmup)
+Chain 2: Iteration: 1000 / 2000 [ 50%]  (Warmup)
+Chain 2: Iteration: 1001 / 2000 [ 50%]  (Sampling)
+Chain 2: Iteration: 1200 / 2000 [ 60%]  (Sampling)
+Chain 2: Iteration: 1400 / 2000 [ 70%]  (Sampling)
+Chain 2: Iteration: 1600 / 2000 [ 80%]  (Sampling)
+Chain 2: Iteration: 1800 / 2000 [ 90%]  (Sampling)
+Chain 2: Iteration: 2000 / 2000 [100%]  (Sampling)
+Chain 2: 
+Chain 2:  Elapsed Time: 0.011 seconds (Warm-up)
+Chain 2:                0.009 seconds (Sampling)
+Chain 2:                0.02 seconds (Total)
+Chain 2: 
+
+SAMPLING FOR MODEL 'anon_model' NOW (CHAIN 3).
+Chain 3: 
+Chain 3: Gradient evaluation took 2e-06 seconds
+Chain 3: 1000 transitions using 10 leapfrog steps per transition would take 0.02 seconds.
+Chain 3: Adjust your expectations accordingly!
+Chain 3: 
+Chain 3: 
+Chain 3: Iteration:    1 / 2000 [  0%]  (Warmup)
+Chain 3: Iteration:  200 / 2000 [ 10%]  (Warmup)
+Chain 3: Iteration:  400 / 2000 [ 20%]  (Warmup)
+Chain 3: Iteration:  600 / 2000 [ 30%]  (Warmup)
+Chain 3: Iteration:  800 / 2000 [ 40%]  (Warmup)
+Chain 3: Iteration: 1000 / 2000 [ 50%]  (Warmup)
+Chain 3: Iteration: 1001 / 2000 [ 50%]  (Sampling)
+Chain 3: Iteration: 1200 / 2000 [ 60%]  (Sampling)
+Chain 3: Iteration: 1400 / 2000 [ 70%]  (Sampling)
+Chain 3: Iteration: 1600 / 2000 [ 80%]  (Sampling)
+Chain 3: Iteration: 1800 / 2000 [ 90%]  (Sampling)
+Chain 3: Iteration: 2000 / 2000 [100%]  (Sampling)
+Chain 3: 
+Chain 3:  Elapsed Time: 0.011 seconds (Warm-up)
+Chain 3:                0.026 seconds (Sampling)
+Chain 3:                0.037 seconds (Total)
+Chain 3: 
+
+SAMPLING FOR MODEL 'anon_model' NOW (CHAIN 4).
+Chain 4: 
+Chain 4: Gradient evaluation took 2e-06 seconds
+Chain 4: 1000 transitions using 10 leapfrog steps per transition would take 0.02 seconds.
+Chain 4: Adjust your expectations accordingly!
+Chain 4: 
+Chain 4: 
+Chain 4: Iteration:    1 / 2000 [  0%]  (Warmup)
+Chain 4: Iteration:  200 / 2000 [ 10%]  (Warmup)
+Chain 4: Iteration:  400 / 2000 [ 20%]  (Warmup)
+Chain 4: Iteration:  600 / 2000 [ 30%]  (Warmup)
+Chain 4: Iteration:  800 / 2000 [ 40%]  (Warmup)
+Chain 4: Iteration: 1000 / 2000 [ 50%]  (Warmup)
+Chain 4: Iteration: 1001 / 2000 [ 50%]  (Sampling)
+Chain 4: Iteration: 1200 / 2000 [ 60%]  (Sampling)
+Chain 4: Iteration: 1400 / 2000 [ 70%]  (Sampling)
+Chain 4: Iteration: 1600 / 2000 [ 80%]  (Sampling)
+Chain 4: Iteration: 1800 / 2000 [ 90%]  (Sampling)
+Chain 4: Iteration: 2000 / 2000 [100%]  (Sampling)
+Chain 4: 
+Chain 4:  Elapsed Time: 0.011 seconds (Warm-up)
+Chain 4:                0.009 seconds (Sampling)
+Chain 4:                0.02 seconds (Total)
+Chain 4: 
+
+> describe_posterior(itrained_four_fit)
+Summary of Posterior Distribution 
+
+Parameter            |   Median |        95% CI |     pd |          ROPE | % in ROPE |  Rhat |     ESS
+------------------------------------------------------------------------------------------------------
+(Intercept)          | 3.14e-04 | [-0.06, 0.06] | 50.52% | [-0.10, 0.10] |      100% | 1.001 | 4579.00
+standardized_reports |     0.74 | [ 0.68, 0.80] |   100% | [-0.10, 0.10] |        0% | 1.000 | 3822.00
+
+> hdi(itrained_four_fit)
+Highest Density Interval 
+
+Parameter            |       95% HDI
+------------------------------------
+(Intercept)          | [-0.06, 0.07]
+standardized_reports | [ 0.68, 0.80]
+
+> itrained_mini_fit <-
++   update(
++     four_fit,
++     newdata = filter(itrained_instilled_reports, str_detect(base_model, "mini"))
++   )
+Start sampling
+
+SAMPLING FOR MODEL 'anon_model' NOW (CHAIN 1).
+Chain 1: 
+Chain 1: Gradient evaluation took 3e-06 seconds
+Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 0.03 seconds.
+Chain 1: Adjust your expectations accordingly!
+Chain 1: 
+Chain 1: 
+Chain 1: Iteration:    1 / 2000 [  0%]  (Warmup)
+Chain 1: Iteration:  200 / 2000 [ 10%]  (Warmup)
+Chain 1: Iteration:  400 / 2000 [ 20%]  (Warmup)
+Chain 1: Iteration:  600 / 2000 [ 30%]  (Warmup)
+Chain 1: Iteration:  800 / 2000 [ 40%]  (Warmup)
+Chain 1: Iteration: 1000 / 2000 [ 50%]  (Warmup)
+Chain 1: Iteration: 1001 / 2000 [ 50%]  (Sampling)
+Chain 1: Iteration: 1200 / 2000 [ 60%]  (Sampling)
+Chain 1: Iteration: 1400 / 2000 [ 70%]  (Sampling)
+Chain 1: Iteration: 1600 / 2000 [ 80%]  (Sampling)
+Chain 1: Iteration: 1800 / 2000 [ 90%]  (Sampling)
+Chain 1: Iteration: 2000 / 2000 [100%]  (Sampling)
+Chain 1: 
+Chain 1:  Elapsed Time: 0.011 seconds (Warm-up)
+Chain 1:                0.02 seconds (Sampling)
+Chain 1:                0.031 seconds (Total)
+Chain 1: 
+
+SAMPLING FOR MODEL 'anon_model' NOW (CHAIN 2).
+Chain 2: 
+Chain 2: Gradient evaluation took 2e-06 seconds
+Chain 2: 1000 transitions using 10 leapfrog steps per transition would take 0.02 seconds.
+Chain 2: Adjust your expectations accordingly!
+Chain 2: 
+Chain 2: 
+Chain 2: Iteration:    1 / 2000 [  0%]  (Warmup)
+Chain 2: Iteration:  200 / 2000 [ 10%]  (Warmup)
+Chain 2: Iteration:  400 / 2000 [ 20%]  (Warmup)
+Chain 2: Iteration:  600 / 2000 [ 30%]  (Warmup)
+Chain 2: Iteration:  800 / 2000 [ 40%]  (Warmup)
+Chain 2: Iteration: 1000 / 2000 [ 50%]  (Warmup)
+Chain 2: Iteration: 1001 / 2000 [ 50%]  (Sampling)
+Chain 2: Iteration: 1200 / 2000 [ 60%]  (Sampling)
+Chain 2: Iteration: 1400 / 2000 [ 70%]  (Sampling)
+Chain 2: Iteration: 1600 / 2000 [ 80%]  (Sampling)
+Chain 2: Iteration: 1800 / 2000 [ 90%]  (Sampling)
+Chain 2: Iteration: 2000 / 2000 [100%]  (Sampling)
+Chain 2: 
+Chain 2:  Elapsed Time: 0.014 seconds (Warm-up)
+Chain 2:                0.01 seconds (Sampling)
+Chain 2:                0.024 seconds (Total)
+Chain 2: 
+
+SAMPLING FOR MODEL 'anon_model' NOW (CHAIN 3).
+Chain 3: 
+Chain 3: Gradient evaluation took 2e-06 seconds
+Chain 3: 1000 transitions using 10 leapfrog steps per transition would take 0.02 seconds.
+Chain 3: Adjust your expectations accordingly!
+Chain 3: 
+Chain 3: 
+Chain 3: Iteration:    1 / 2000 [  0%]  (Warmup)
+Chain 3: Iteration:  200 / 2000 [ 10%]  (Warmup)
+Chain 3: Iteration:  400 / 2000 [ 20%]  (Warmup)
+Chain 3: Iteration:  600 / 2000 [ 30%]  (Warmup)
+Chain 3: Iteration:  800 / 2000 [ 40%]  (Warmup)
+Chain 3: Iteration: 1000 / 2000 [ 50%]  (Warmup)
+Chain 3: Iteration: 1001 / 2000 [ 50%]  (Sampling)
+Chain 3: Iteration: 1200 / 2000 [ 60%]  (Sampling)
+Chain 3: Iteration: 1400 / 2000 [ 70%]  (Sampling)
+Chain 3: Iteration: 1600 / 2000 [ 80%]  (Sampling)
+Chain 3: Iteration: 1800 / 2000 [ 90%]  (Sampling)
+Chain 3: Iteration: 2000 / 2000 [100%]  (Sampling)
+Chain 3: 
+Chain 3:  Elapsed Time: 0.011 seconds (Warm-up)
+Chain 3:                0.009 seconds (Sampling)
+Chain 3:                0.02 seconds (Total)
+Chain 3: 
+
+SAMPLING FOR MODEL 'anon_model' NOW (CHAIN 4).
+Chain 4: 
+Chain 4: Gradient evaluation took 1e-06 seconds
+Chain 4: 1000 transitions using 10 leapfrog steps per transition would take 0.01 seconds.
+Chain 4: Adjust your expectations accordingly!
+Chain 4: 
+Chain 4: 
+Chain 4: Iteration:    1 / 2000 [  0%]  (Warmup)
+Chain 4: Iteration:  200 / 2000 [ 10%]  (Warmup)
+Chain 4: Iteration:  400 / 2000 [ 20%]  (Warmup)
+Chain 4: Iteration:  600 / 2000 [ 30%]  (Warmup)
+Chain 4: Iteration:  800 / 2000 [ 40%]  (Warmup)
+Chain 4: Iteration: 1000 / 2000 [ 50%]  (Warmup)
+Chain 4: Iteration: 1001 / 2000 [ 50%]  (Sampling)
+Chain 4: Iteration: 1200 / 2000 [ 60%]  (Sampling)
+Chain 4: Iteration: 1400 / 2000 [ 70%]  (Sampling)
+Chain 4: Iteration: 1600 / 2000 [ 80%]  (Sampling)
+Chain 4: Iteration: 1800 / 2000 [ 90%]  (Sampling)
+Chain 4: Iteration: 2000 / 2000 [100%]  (Sampling)
+Chain 4: 
+Chain 4:  Elapsed Time: 0.012 seconds (Warm-up)
+Chain 4:                0.009 seconds (Sampling)
+Chain 4:                0.021 seconds (Total)
+Chain 4: 
+
+> describe_posterior(itrained_mini_fit)
+Summary of Posterior Distribution 
+
+Parameter            |   Median |        95% CI |     pd |          ROPE | % in ROPE |  Rhat |     ESS
+------------------------------------------------------------------------------------------------------
+(Intercept)          | 9.26e-04 | [-0.07, 0.06] | 51.10% | [-0.10, 0.10] |      100% | 1.001 | 3227.00
+standardized_reports |     0.66 | [ 0.59, 0.72] |   100% | [-0.10, 0.10] |        0% | 1.000 | 4303.00
+
+> hdi(itrained_mini_fit)
+Highest Density Interval 
+
+Parameter            |       95% HDI
+------------------------------------
+(Intercept)          | [-0.07, 0.06]
+standardized_reports | [ 0.59, 0.72]
+
+> itraining_effect_data <-
++   bind_rows(
++     inst_models_inst_reports %>%
++       mutate(itrained = FALSE),
++     itrained_instilled_reports %>%
++  .... [TRUNCATED] 
+
+> overall_itraining_effect_model <-
++   brm(
++     formula = standardized_b ~ standardized_reports * itrained * base_model,
++     data = itraining_eff .... [TRUNCATED] 
+Compiling Stan program...
+Start sampling
+starting worker pid=80660 on localhost:11802 at 18:10:27.430
+starting worker pid=80673 on localhost:11802 at 18:10:27.520
+starting worker pid=80686 on localhost:11802 at 18:10:27.595
+starting worker pid=80699 on localhost:11802 at 18:10:27.684
+
+SAMPLING FOR MODEL 'anon_model' NOW (CHAIN 1).
+Chain 1: 
+Chain 1: Gradient evaluation took 1.9e-05 seconds
+Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 0.19 seconds.
+Chain 1: Adjust your expectations accordingly!
+Chain 1: 
+Chain 1: 
+Chain 1: Iteration:    1 / 2000 [  0%]  (Warmup)
+Chain 1: Iteration:  200 / 2000 [ 10%]  (Warmup)
+Chain 1: Iteration:  400 / 2000 [ 20%]  (Warmup)
+Chain 1: Iteration:  600 / 2000 [ 30%]  (Warmup)
+Chain 1: Iteration:  800 / 2000 [ 40%]  (Warmup)
+Chain 1: Iteration: 1000 / 2000 [ 50%]  (Warmup)
+Chain 1: Iteration: 1001 / 2000 [ 50%]  (Sampling)
+Chain 1: Iteration: 1200 / 2000 [ 60%]  (Sampling)
+Chain 1: Iteration: 1400 / 2000 [ 70%]  (Sampling)
+Chain 1: Iteration: 1600 / 2000 [ 80%]  (Sampling)
+Chain 1: Iteration: 1800 / 2000 [ 90%]  (Sampling)
+Chain 1: Iteration: 2000 / 2000 [100%]  (Sampling)
+Chain 1: 
+Chain 1:  Elapsed Time: 0.158 seconds (Warm-up)
+Chain 1:                0.143 seconds (Sampling)
+Chain 1:                0.301 seconds (Total)
+Chain 1: 
+
+SAMPLING FOR MODEL 'anon_model' NOW (CHAIN 2).
+Chain 2: 
+Chain 2: Gradient evaluation took 4.8e-05 seconds
+Chain 2: 1000 transitions using 10 leapfrog steps per transition would take 0.48 seconds.
+Chain 2: Adjust your expectations accordingly!
+Chain 2: 
+Chain 2: 
+Chain 2: Iteration:    1 / 2000 [  0%]  (Warmup)
+Chain 2: Iteration:  200 / 2000 [ 10%]  (Warmup)
+Chain 2: Iteration:  400 / 2000 [ 20%]  (Warmup)
+Chain 2: Iteration:  600 / 2000 [ 30%]  (Warmup)
+Chain 2: Iteration:  800 / 2000 [ 40%]  (Warmup)
+Chain 2: Iteration: 1000 / 2000 [ 50%]  (Warmup)
+Chain 2: Iteration: 1001 / 2000 [ 50%]  (Sampling)
+Chain 2: Iteration: 1200 / 2000 [ 60%]  (Sampling)
+Chain 2: Iteration: 1400 / 2000 [ 70%]  (Sampling)
+Chain 2: Iteration: 1600 / 2000 [ 80%]  (Sampling)
+Chain 2: Iteration: 1800 / 2000 [ 90%]  (Sampling)
+Chain 2: Iteration: 2000 / 2000 [100%]  (Sampling)
+Chain 2: 
+Chain 2:  Elapsed Time: 0.16 seconds (Warm-up)
+Chain 2:                0.17 seconds (Sampling)
+Chain 2:                0.33 seconds (Total)
+Chain 2: 
+
+SAMPLING FOR MODEL 'anon_model' NOW (CHAIN 3).
+Chain 3: 
+Chain 3: Gradient evaluation took 2.1e-05 seconds
+Chain 3: 1000 transitions using 10 leapfrog steps per transition would take 0.21 seconds.
+Chain 3: Adjust your expectations accordingly!
+Chain 3: 
+Chain 3: 
+Chain 3: Iteration:    1 / 2000 [  0%]  (Warmup)
+Chain 3: Iteration:  200 / 2000 [ 10%]  (Warmup)
+Chain 3: Iteration:  400 / 2000 [ 20%]  (Warmup)
+Chain 3: Iteration:  600 / 2000 [ 30%]  (Warmup)
+Chain 3: Iteration:  800 / 2000 [ 40%]  (Warmup)
+Chain 3: Iteration: 1000 / 2000 [ 50%]  (Warmup)
+Chain 3: Iteration: 1001 / 2000 [ 50%]  (Sampling)
+
+SAMPLING FOR MODEL 'anon_model' NOW (CHAIN 4).
+Chain 4: 
+Chain 4: Gradient evaluation took 1.7e-05 seconds
+Chain 4: 1000 transitions using 10 leapfrog steps per transition would take 0.17 seconds.
+Chain 4: Adjust your expectations accordingly!
+Chain 4: 
+Chain 4: 
+Chain 4: Iteration:    1 / 2000 [  0%]  (Warmup)
+Chain 3: Iteration: 1200 / 2000 [ 60%]  (Sampling)
+Chain 4: Iteration:  200 / 2000 [ 10%]  (Warmup)
+Chain 3: Iteration: 1400 / 2000 [ 70%]  (Sampling)
+Chain 4: Iteration:  400 / 2000 [ 20%]  (Warmup)
+Chain 3: Iteration: 1600 / 2000 [ 80%]  (Sampling)
+Chain 4: Iteration:  600 / 2000 [ 30%]  (Warmup)
+Chain 3: Iteration: 1800 / 2000 [ 90%]  (Sampling)
+Chain 4: Iteration:  800 / 2000 [ 40%]  (Warmup)
+Chain 4: Iteration: 1000 / 2000 [ 50%]  (Warmup)
+Chain 4: Iteration: 1001 / 2000 [ 50%]  (Sampling)
+Chain 3: Iteration: 2000 / 2000 [100%]  (Sampling)
+Chain 3: 
+Chain 3:  Elapsed Time: 0.155 seconds (Warm-up)
+Chain 3:                0.155 seconds (Sampling)
+Chain 3:                0.31 seconds (Total)
+Chain 3: 
+Chain 4: Iteration: 1200 / 2000 [ 60%]  (Sampling)
+Chain 4: Iteration: 1400 / 2000 [ 70%]  (Sampling)
+Chain 4: Iteration: 1600 / 2000 [ 80%]  (Sampling)
+Chain 4: Iteration: 1800 / 2000 [ 90%]  (Sampling)
+Chain 4: Iteration: 2000 / 2000 [100%]  (Sampling)
+Chain 4: 
+Chain 4:  Elapsed Time: 0.135 seconds (Warm-up)
+Chain 4:                0.126 seconds (Sampling)
+Chain 4:                0.261 seconds (Total)
+Chain 4: 
+Warning message:
+package ‘StanHeaders’ was built under R version 4.4.1 
+Warning message:
+package ‘StanHeaders’ was built under R version 4.4.1 
+Warning message:
+package ‘StanHeaders’ was built under R version 4.4.1 
+Warning message:
+package ‘StanHeaders’ was built under R version 4.4.1 
+
+> itrain_trends <-
++   emtrends(
++     overall_itraining_effect_model,
++     "itrained",
++     "standardized_reports",
++     weights = "equal"
++   )
+NOTE: Results may be misleading due to involvement in interactions
+
+> itrain_cont <- contrast(itrain_trends, method = "revpairwise")
+
+> summary(itrain_cont, infer = c(TRUE, TRUE), level = 0.95)
+ contrast     estimate lower.HPD upper.HPD
+ TRUE - FALSE    0.364     0.276     0.464
+
+Results are averaged over the levels of: base_model 
+Point estimate displayed: median 
+HPD interval probability: 0.95 
+
+> # Load native preferences.
+> native_regression_results <-
++   map_dfr(base_models, function(model) {
++     read_csv(paste0("data/", model, "_latent_ ..." ... [TRUNCATED] 
+Rows: 100 Columns: 6                                                                                                                    
+── Column specification ────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+Delimiter: ","
+chr (1): scenario
+dbl (5): b_attr1, b_attr2, b_attr3, b_attr4, b_attr5
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+Rows: 100 Columns: 6                                                                                                                    
+── Column specification ────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+Delimiter: ","
+chr (1): scenario
+dbl (5): b_attr1, b_attr2, b_attr3, b_attr4, b_attr5
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+
+> inst_native_reports <-
++   mean_reports %>%
++   filter(str_detect(model, "instilled")) %>%
++   inner_join(native_regression_results)
+Joining with `by = join_by(model, scenario, attr)`
+
+> itrained_inst_native_reports <-
++   mean_reports %>%
++   filter(str_detect(model, "itrained")) %>%
++   inner_join(native_regression_results)
+Joining with `by = join_by(model, scenario, attr)`
+
+> native_effect_data <-
++   mean_reports %>%
++   filter(
++     str_detect(model, "100-instilled|itrained-all-100")
++   ) %>%
++   mutate(
++     itraine .... [TRUNCATED] 
+
+> # Test if training improves performance on native preferences.
+> native_effect_data %>%
++   group_by(base_model, itrained) %>%
++   summarise(cor = c .... [TRUNCATED] 
+`summarise()` has grouped output by 'base_model'. You can override using the `.groups` argument.
+# A tibble: 4 × 3
+# Groups:   base_model [2]
+  base_model             itrained   cor
+  <chr>                  <lgl>    <dbl>
+1 gpt-4o-2024-08-06      FALSE    0.464
+2 gpt-4o-2024-08-06      TRUE     0.710
+3 gpt-4o-mini-2024-07-18 FALSE    0.115
+4 gpt-4o-mini-2024-07-18 TRUE     0.568
+
+> native_fit <- update(overall_itraining_effect_model, newdata = native_effect_data)
+Start sampling
+
+SAMPLING FOR MODEL 'anon_model' NOW (CHAIN 1).
+Chain 1: 
+Chain 1: Gradient evaluation took 1.9e-05 seconds
+Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 0.19 seconds.
+Chain 1: Adjust your expectations accordingly!
+Chain 1: 
+Chain 1: 
+Chain 1: Iteration:    1 / 2000 [  0%]  (Warmup)
+Chain 1: Iteration:  200 / 2000 [ 10%]  (Warmup)
+Chain 1: Iteration:  400 / 2000 [ 20%]  (Warmup)
+Chain 1: Iteration:  600 / 2000 [ 30%]  (Warmup)
+Chain 1: Iteration:  800 / 2000 [ 40%]  (Warmup)
+Chain 1: Iteration: 1000 / 2000 [ 50%]  (Warmup)
+Chain 1: Iteration: 1001 / 2000 [ 50%]  (Sampling)
+Chain 1: Iteration: 1200 / 2000 [ 60%]  (Sampling)
+Chain 1: Iteration: 1400 / 2000 [ 70%]  (Sampling)
+Chain 1: Iteration: 1600 / 2000 [ 80%]  (Sampling)
+Chain 1: Iteration: 1800 / 2000 [ 90%]  (Sampling)
+Chain 1: Iteration: 2000 / 2000 [100%]  (Sampling)
+Chain 1: 
+Chain 1:  Elapsed Time: 0.142 seconds (Warm-up)
+Chain 1:                0.137 seconds (Sampling)
+Chain 1:                0.279 seconds (Total)
+Chain 1: 
+
+SAMPLING FOR MODEL 'anon_model' NOW (CHAIN 2).
+Chain 2: 
+Chain 2: Gradient evaluation took 8e-06 seconds
+Chain 2: 1000 transitions using 10 leapfrog steps per transition would take 0.08 seconds.
+Chain 2: Adjust your expectations accordingly!
+Chain 2: 
+Chain 2: 
+Chain 2: Iteration:    1 / 2000 [  0%]  (Warmup)
+Chain 2: Iteration:  200 / 2000 [ 10%]  (Warmup)
+Chain 2: Iteration:  400 / 2000 [ 20%]  (Warmup)
+Chain 2: Iteration:  600 / 2000 [ 30%]  (Warmup)
+Chain 2: Iteration:  800 / 2000 [ 40%]  (Warmup)
+Chain 2: Iteration: 1000 / 2000 [ 50%]  (Warmup)
+Chain 2: Iteration: 1001 / 2000 [ 50%]  (Sampling)
+Chain 2: Iteration: 1200 / 2000 [ 60%]  (Sampling)
+Chain 2: Iteration: 1400 / 2000 [ 70%]  (Sampling)
+Chain 2: Iteration: 1600 / 2000 [ 80%]  (Sampling)
+Chain 2: Iteration: 1800 / 2000 [ 90%]  (Sampling)
+Chain 2: Iteration: 2000 / 2000 [100%]  (Sampling)
+Chain 2: 
+Chain 2:  Elapsed Time: 0.128 seconds (Warm-up)
+Chain 2:                0.127 seconds (Sampling)
+Chain 2:                0.255 seconds (Total)
+Chain 2: 
+
+SAMPLING FOR MODEL 'anon_model' NOW (CHAIN 3).
+Chain 3: 
+Chain 3: Gradient evaluation took 7e-06 seconds
+Chain 3: 1000 transitions using 10 leapfrog steps per transition would take 0.07 seconds.
+Chain 3: Adjust your expectations accordingly!
+Chain 3: 
+Chain 3: 
+Chain 3: Iteration:    1 / 2000 [  0%]  (Warmup)
+Chain 3: Iteration:  200 / 2000 [ 10%]  (Warmup)
+Chain 3: Iteration:  400 / 2000 [ 20%]  (Warmup)
+Chain 3: Iteration:  600 / 2000 [ 30%]  (Warmup)
+Chain 3: Iteration:  800 / 2000 [ 40%]  (Warmup)
+Chain 3: Iteration: 1000 / 2000 [ 50%]  (Warmup)
+Chain 3: Iteration: 1001 / 2000 [ 50%]  (Sampling)
+Chain 3: Iteration: 1200 / 2000 [ 60%]  (Sampling)
+Chain 3: Iteration: 1400 / 2000 [ 70%]  (Sampling)
+Chain 3: Iteration: 1600 / 2000 [ 80%]  (Sampling)
+Chain 3: Iteration: 1800 / 2000 [ 90%]  (Sampling)
+Chain 3: Iteration: 2000 / 2000 [100%]  (Sampling)
+Chain 3: 
+Chain 3:  Elapsed Time: 0.137 seconds (Warm-up)
+Chain 3:                0.16 seconds (Sampling)
+Chain 3:                0.297 seconds (Total)
+Chain 3: 
+
+SAMPLING FOR MODEL 'anon_model' NOW (CHAIN 4).
+Chain 4: 
+Chain 4: Gradient evaluation took 6e-06 seconds
+Chain 4: 1000 transitions using 10 leapfrog steps per transition would take 0.06 seconds.
+Chain 4: Adjust your expectations accordingly!
+Chain 4: 
+Chain 4: 
+Chain 4: Iteration:    1 / 2000 [  0%]  (Warmup)
+Chain 4: Iteration:  200 / 2000 [ 10%]  (Warmup)
+Chain 4: Iteration:  400 / 2000 [ 20%]  (Warmup)
+Chain 4: Iteration:  600 / 2000 [ 30%]  (Warmup)
+Chain 4: Iteration:  800 / 2000 [ 40%]  (Warmup)
+Chain 4: Iteration: 1000 / 2000 [ 50%]  (Warmup)
+Chain 4: Iteration: 1001 / 2000 [ 50%]  (Sampling)
+Chain 4: Iteration: 1200 / 2000 [ 60%]  (Sampling)
+Chain 4: Iteration: 1400 / 2000 [ 70%]  (Sampling)
+Chain 4: Iteration: 1600 / 2000 [ 80%]  (Sampling)
+Chain 4: Iteration: 1800 / 2000 [ 90%]  (Sampling)
+Chain 4: Iteration: 2000 / 2000 [100%]  (Sampling)
+Chain 4: 
+Chain 4:  Elapsed Time: 0.142 seconds (Warm-up)
+Chain 4:                0.112 seconds (Sampling)
+Chain 4:                0.254 seconds (Total)
+Chain 4: 
+
+> all_native_trends <-
++   emtrends(
++     native_fit,
++     "itrained",
++     "standardized_reports",
++     weights = "equal"
++   )
+NOTE: Results may be misleading due to involvement in interactions
+
+> native_cont <- contrast(all_native_trends, method = "revpairwise")
+
+> summary(native_cont, infer = c(TRUE, TRUE), level = 0.95)
+ contrast     estimate lower.HPD upper.HPD
+ TRUE - FALSE     0.35     0.253     0.444
+
+Results are averaged over the levels of: base_model 
+Point estimate displayed: median 
+HPD interval probability: 0.95 
+Warning messages:
+1: package ‘bayestestR’ was built under R version 4.4.1 
+2: package ‘emmeans’ was built under R version 4.4.1 
+
