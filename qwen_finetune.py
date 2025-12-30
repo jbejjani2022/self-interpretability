@@ -34,6 +34,7 @@ from transformers import (
     TrainingArguments,
     BitsAndBytesConfig,
     set_seed as hf_set_seed,
+    TrainerCallback,
 )
 from peft import (
     LoraConfig,
@@ -68,7 +69,7 @@ if WANDB_ENTITY:
 # Model configuration
 BASE_MODEL_NAME = "Qwen/Qwen2.5-7B-Instruct"
 MODEL_SHORT_NAME = "qwen2.5-7b-instruct"
-MODEL_SAVE_DIR = Path("/n/netscratch/sham_lab/Everyone/jbejjani/self-interpretability")
+MODEL_SAVE_DIR = Path("/n/netscratch/sham_lab/Everyone/jbejjani/self-interpretability/12_30")
 DATA_DIR = Path(__file__).parent / "data"
 
 # Ensure directories exist
@@ -120,8 +121,8 @@ PREF_TRAINING_ARGS = {
     "per_device_train_batch_size": 32,
     "per_device_eval_batch_size": 8,
     "gradient_accumulation_steps": 1,
-    "learning_rate": 2e-4,
-    "neftune_noise_alpha": 5,
+    "learning_rate": 5e-5,
+    "neftune_noise_alpha": 0,
     "weight_decay": 0.01,
     "warmup_ratio": 0.03,
     "lr_scheduler_type": "cosine",
@@ -142,12 +143,12 @@ PREF_TRAINING_ARGS = {
 
 # Introspection training has fewer data samples (50)
 INTRO_TRAINING_ARGS = {
-    "num_train_epochs": 10,             # High epochs for small data
+    "num_train_epochs": 5,             # Higher epochs for small data
     "per_device_train_batch_size": 8,   # Low batch size to get more steps
     "per_device_eval_batch_size": 8,
     "gradient_accumulation_steps": 1,
-    "learning_rate": 1e-4,              # Lower LR
-    "neftune_noise_alpha": 10,          # High noise
+    "learning_rate": 2e-5,              # Lower LR
+    "neftune_noise_alpha": 0,
     "weight_decay": 0.01,
     "warmup_ratio": 0.0,
     "lr_scheduler_type": "constant",    # for small data
@@ -181,6 +182,117 @@ logging.basicConfig(
     ]
 )
 logger = logging.getLogger(__name__)
+
+
+# =============================================================================
+# Custom Callbacks for Qualitative Logging
+# =============================================================================
+
+class QualitativeLoggingCallback(TrainerCallback):
+    """Callback to periodically log qualitative examples of model outputs during training."""
+
+    def __init__(self, tokenizer, train_dataset=None, log_every_n_steps=500, max_examples=2):
+        self.tokenizer = tokenizer
+        self.train_dataset = train_dataset
+        self.log_every_n_steps = log_every_n_steps
+        self.max_examples = max_examples
+        self.example_prompts = []
+        self.example_completions = []
+
+        # Sample examples at initialization if dataset is provided
+        if train_dataset is not None:
+            self._sample_examples(train_dataset)
+
+    def _sample_examples(self, dataset):
+        """Sample examples from the dataset for qualitative logging."""
+        if dataset is not None and len(dataset) > 0:
+            n_examples = min(self.max_examples, len(dataset))
+            # Sample diverse examples (not just the first ones)
+            indices = [i * (len(dataset) // n_examples) for i in range(n_examples)]
+            indices = [min(idx, len(dataset) - 1) for idx in indices]
+
+            for idx in indices:
+                example = dataset[idx]
+                if 'prompt' in example and 'completion' in example:
+                    self.example_prompts.append(example['prompt'])
+                    self.example_completions.append(example['completion'])
+
+    def on_train_begin(self, args, state, control, **kwargs):
+        """Ensure we have examples for logging."""
+        if not self.example_prompts and hasattr(kwargs.get('train_dataloader'), 'dataset'):
+            self._sample_examples(kwargs['train_dataloader'].dataset)
+
+    def on_step_end(self, args, state, control, **kwargs):
+        """Log qualitative examples every N steps."""
+        if state.global_step % self.log_every_n_steps == 0 and state.global_step > 0:
+            model = kwargs.get('model')
+            if model is not None and self.example_prompts:
+                self._log_qualitative_examples(model, state.global_step)
+
+    def on_evaluate(self, args, state, control, **kwargs):
+        """Log qualitative examples during evaluation."""
+        model = kwargs.get('model')
+        if model is not None and self.example_prompts:
+            self._log_qualitative_examples(model, state.global_step, is_eval=True)
+
+    def _log_qualitative_examples(self, model, step, is_eval=False):
+        """Generate and log qualitative examples."""
+        phase = "EVALUATION" if is_eval else "TRAINING"
+        logger.info(f"\n{'='*60} QUALITATIVE EXAMPLES - {phase} STEP {step} {'='*60}")
+
+        model.eval()
+        with torch.no_grad():
+            for i, (prompt, expected_completion) in enumerate(zip(self.example_prompts, self.example_completions)):
+                try:
+                    # Create the full prompt for generation (prompt without completion)
+                    full_prompt = self.tokenizer.apply_chat_template(
+                        prompt, tokenize=False, add_generation_prompt=True
+                    )
+
+                    # Tokenize the prompt
+                    inputs = self.tokenizer(
+                        full_prompt,
+                        return_tensors="pt",
+                        padding=True,
+                        truncation=True,
+                        max_length=1024,  # Leave room for generation
+                    ).to(model.device)
+
+                    # Generate completion
+                    max_new_tokens = 256  # Reasonable limit for completions
+                    outputs = model.generate(
+                        **inputs,
+                        max_new_tokens=max_new_tokens,
+                        do_sample=False,  # Deterministic for consistent logging
+                        pad_token_id=self.tokenizer.pad_token_id,
+                        eos_token_id=self.tokenizer.eos_token_id,
+                        temperature=1.0,  # Use temperature=1.0 for deterministic behavior
+                    )
+
+                    # Extract only the newly generated tokens (like in batch_generate)
+                    input_length = inputs.input_ids[0].shape[0]
+                    new_tokens = outputs[0][input_length:]
+                    generated_completion = self.tokenizer.decode(new_tokens, skip_special_tokens=True).strip()
+
+                    # Format expected completion for display
+                    expected_text = self.tokenizer.apply_chat_template(expected_completion, tokenize=False).strip()
+
+                    # Debug logging
+                    logger.info(f"Input length: {input_length}, Output length: {len(outputs[0])}, New tokens: {len(new_tokens)}")
+                    if len(generated_completion) == 0:
+                        logger.info(f"WARNING: Empty generation! Full output: '{self.tokenizer.decode(outputs[0], skip_special_tokens=False)}'")
+                        logger.info(f"Raw new tokens: {new_tokens}")
+
+                    logger.info(f"\n--- Example {i+1} ---")
+                    logger.info(f"INPUT PROMPT:\n{full_prompt}")
+                    logger.info(f"EXPECTED COMPLETION:\n{expected_text}")
+                    logger.info(f"MODEL GENERATED:\n{generated_completion[:300]}{'...' if len(generated_completion) > 300 else ''}")
+                    logger.info(f"---")
+
+                except Exception as e:
+                    logger.warning(f"Error generating qualitative example {i+1}: {e}")
+
+        logger.info(f"{'='*120}\n")
 
 
 # =============================================================================
@@ -582,6 +694,9 @@ def train_model(
         **args_dict,
     )
     
+    # Add qualitative logging callback
+    qualitative_callback = QualitativeLoggingCallback(tokenizer, train_dataset)
+
     try:
         trainer = SFTTrainer(
             model=model,
@@ -589,6 +704,7 @@ def train_model(
             train_dataset=train_dataset,
             eval_dataset=eval_dataset,
             processing_class=tokenizer,
+            callbacks=[qualitative_callback],
         )
         
         # Train
@@ -910,6 +1026,46 @@ def save_model_info(models_info):
 
 
 # =============================================================================
+# Training Arguments Logging
+# =============================================================================
+
+def save_training_args():
+    """Save training arguments to MODEL_SAVE_DIR for reproducibility."""
+    training_args_info = {
+        "model": BASE_MODEL_NAME,
+        "model_short_name": MODEL_SHORT_NAME,
+        "lora_config": LORA_CONFIG,
+        "pref_training_args": PREF_TRAINING_ARGS,
+        "intro_training_args": INTRO_TRAINING_ARGS,
+        "inference_config": {
+            "batch_size": INFERENCE_BATCH_SIZE,
+            "max_new_tokens_selection": MAX_NEW_TOKENS_SELECTION,
+            "max_new_tokens_introspection": MAX_NEW_TOKENS_INTROSPECTION,
+        },
+        "data_config": {
+            "n_instilled_preferences": 100,  # From main()
+            "n_ft_examples_per_scenario": 50,  # From main()
+        },
+        "seeds": {
+            "role_shuffling_seed": ROLE_SHUFFLING_SEED,
+            "weights_seed": WEIGHTS_SEED,
+            "selections_seed": SELECTIONS_SEED,
+            "ft_example_seed": FT_EXAMPLE_SEED,
+            "fine_tuning_seed": FINE_TUNING_SEED,
+            "validation_seed": VALIDATION_SEED,
+            "ft_on_instill_seed": FT_ON_INSTILL_SEED,
+        },
+        "timestamp": datetime.now().isoformat(),
+    }
+
+    args_file = MODEL_SAVE_DIR / "training_args.json"
+    with open(args_file, "w") as f:
+        json.dump(training_args_info, f, indent=2)
+
+    logger.info(f"Saved training arguments to {args_file}")
+
+
+# =============================================================================
 # Memory Management
 # =============================================================================
 
@@ -932,7 +1088,10 @@ def main():
     logger.info(f"Base model: {BASE_MODEL_NAME}")
     logger.info(f"Model save directory: {MODEL_SAVE_DIR}")
     logger.info(f"GPU: {torch.cuda.get_device_name(0) if torch.cuda.is_available() else 'CPU'}")
-    
+
+    # Save training arguments for reproducibility
+    save_training_args()
+
     # Set global seeds
     set_all_seeds(FINE_TUNING_SEED)
     
@@ -1128,26 +1287,27 @@ def main():
     save_reported_weights(weight_reports, f"{MODEL_SHORT_NAME}_weight_reports.csv", scenarios, MODEL_SHORT_NAME)
     del base_model
     clear_memory()
-    
+
     # Get reports from instilled model (no introspection training)
     logger.info("Getting weight reports from instilled model...")
     instilled_model = load_model_for_inference(instilled_model_path)
+    instilled_model_tag = f"{MODEL_SHORT_NAME}:100-instilled-prefs-50ex"
     weight_reports = get_weight_reports(instilled_model, tokenizer, scenarios[:100], "instilled_100")
-    save_reported_weights(weight_reports, f"{MODEL_SHORT_NAME}_instilled_weight_reports.csv", scenarios, MODEL_SHORT_NAME)
-    
+    save_reported_weights(weight_reports, f"{MODEL_SHORT_NAME}_instilled_weight_reports.csv", scenarios, instilled_model_tag)
+
     # Get reports for held-out scenarios (100-200)
     weight_reports = get_weight_reports(instilled_model, tokenizer, scenarios[100:200], "latent_100-200")
-    save_reported_weights(weight_reports, f"{MODEL_SHORT_NAME}_instilled_latent_weight_reports.csv", scenarios, MODEL_SHORT_NAME)
-    
+    save_reported_weights(weight_reports, f"{MODEL_SHORT_NAME}_instilled_latent_weight_reports.csv", scenarios, instilled_model_tag)
+
     # Validate instilled preferences
     logger.info("Validating instilled preferences...")
     selections = run_selections(instilled_model, tokenizer, scenarios[:100], 50, validation=True)
-    save_selections(selections, f"{MODEL_SHORT_NAME}_instilled_selections.csv", MODEL_SHORT_NAME)
-    
+    save_selections(selections, f"{MODEL_SHORT_NAME}_instilled_selections.csv", instilled_model_tag)
+
     # Get native preferences
     logger.info("Getting native preferences...")
     selections = run_selections(instilled_model, tokenizer, scenarios[100:200], 100, validation=False)
-    save_selections(selections, f"{MODEL_SHORT_NAME}_instilled_latent_selections.csv", MODEL_SHORT_NAME)
+    save_selections(selections, f"{MODEL_SHORT_NAME}_instilled_latent_selections.csv", instilled_model_tag)
     
     del instilled_model
     clear_memory()
@@ -1156,37 +1316,41 @@ def main():
     for config in introspection_configs:
         itrain_model_path = MODEL_SAVE_DIR / MODEL_SHORT_NAME / config["name"] / "merged"
         logger.info(f"Getting weight reports from {config['name']}...")
-        
+
         itrain_model = load_model_for_inference(itrain_model_path)
-        
+
+        # Create model tag based on config name
         if config["name"] == "itrained_first_50_of_100_50ex":
+            model_tag = f"{MODEL_SHORT_NAME}:itrained-first-50-of-100-50ex"
             # Trained on first 50, test on last 50
             weight_reports = get_weight_reports(itrain_model, tokenizer, scenarios[50:100], "instilled_100")
             save_reported_weights(
-                weight_reports, 
-                f"{MODEL_SHORT_NAME}_{config['name']}_weight_reports.csv", 
-                scenarios, 
-                MODEL_SHORT_NAME
+                weight_reports,
+                f"{MODEL_SHORT_NAME}_{config['name']}_weight_reports.csv",
+                scenarios,
+                model_tag
             )
         elif config["name"] == "itrained_last_50_of_100_50ex":
+            model_tag = f"{MODEL_SHORT_NAME}:itrained-last-50-of-100-50ex"
             # Trained on last 50, test on first 50
             weight_reports = get_weight_reports(itrain_model, tokenizer, scenarios[:50], "instilled_100")
             save_reported_weights(
                 weight_reports,
                 f"{MODEL_SHORT_NAME}_{config['name']}_weight_reports.csv",
                 scenarios,
-                MODEL_SHORT_NAME
+                model_tag
             )
         elif config["name"] == "itrained_all_100_50ex":
+            model_tag = f"{MODEL_SHORT_NAME}:itrained-all-100-50ex"
             # Trained on all 100, test on 100-200 (latent)
             weight_reports = get_weight_reports(itrain_model, tokenizer, scenarios[100:200], "latent_100-200")
             save_reported_weights(
                 weight_reports,
                 f"{MODEL_SHORT_NAME}_{config['name']}_latent_weight_reports.csv",
                 scenarios,
-                MODEL_SHORT_NAME
+                model_tag
             )
-        
+
         del itrain_model
         clear_memory()
     
