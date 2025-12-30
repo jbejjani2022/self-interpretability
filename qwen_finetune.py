@@ -69,7 +69,7 @@ if WANDB_ENTITY:
 # Model configuration
 BASE_MODEL_NAME = "Qwen/Qwen2.5-7B-Instruct"
 MODEL_SHORT_NAME = "qwen2.5-7b-instruct"
-MODEL_SAVE_DIR = Path("/n/netscratch/sham_lab/Everyone/jbejjani/self-interpretability/12_30")
+MODEL_SAVE_DIR = Path("/n/netscratch/sham_lab/Everyone/jbejjani/self-interpretability/12_30_v2")
 DATA_DIR = Path(__file__).parent / "data"
 
 # Ensure directories exist
@@ -147,7 +147,7 @@ INTRO_TRAINING_ARGS = {
     "per_device_train_batch_size": 8,   # Low batch size to get more steps
     "per_device_eval_batch_size": 8,
     "gradient_accumulation_steps": 1,
-    "learning_rate": 2e-5,              # Lower LR
+    "learning_rate": 1e-5,              # Lower LR
     "neftune_noise_alpha": 0,
     "weight_decay": 0.01,
     "warmup_ratio": 0.0,
