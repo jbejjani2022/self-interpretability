@@ -2,3 +2,8 @@
 __pycache__
 *.err
 *.out
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+*.Rproj
