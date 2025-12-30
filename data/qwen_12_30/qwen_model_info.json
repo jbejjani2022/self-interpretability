@@ -1,0 +1,9 @@
+{
+    "qwen2.5-7b-instruct": {
+        "base": "Qwen/Qwen2.5-7B-Instruct",
+        "100_instilled_prefs_50ex": "/n/netscratch/sham_lab/Everyone/jbejjani/self-interpretability/12_30/qwen2.5-7b-instruct/100_instilled_prefs_50ex/merged",
+        "itrained_first_50_of_100_50ex": "/n/netscratch/sham_lab/Everyone/jbejjani/self-interpretability/12_30/qwen2.5-7b-instruct/itrained_first_50_of_100_50ex/merged",
+        "itrained_last_50_of_100_50ex": "/n/netscratch/sham_lab/Everyone/jbejjani/self-interpretability/12_30/qwen2.5-7b-instruct/itrained_last_50_of_100_50ex/merged",
+        "itrained_all_100_50ex": "/n/netscratch/sham_lab/Everyone/jbejjani/self-interpretability/12_30/qwen2.5-7b-instruct/itrained_all_100_50ex/merged"
+    }
+}
